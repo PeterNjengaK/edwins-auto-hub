@@ -1,0 +1,188 @@
+<!-- admin/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Admin Dashboard | Edwin's Auto Hub</title>
+  <link rel="stylesheet" href="../style.css" />
+</head>
+<body>
+  <div class="page-container">
+    <header>
+      <div class="logo">Admin | Edwin's Auto Hub</div>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Client View</a></li>
+        </ul>
+      </nav>
+    </header>
+    <main>
+      <section class="form-section">
+        <h1>Add / Edit Car</h1>
+        <form id="adminCarForm" enctype="multipart/form-data">
+          <input type="hidden" id="car-id" />
+
+          <label>Car Name</label>
+          <input type="text" id="car-name" required />
+
+          <label>Upload Car Image</label>
+          <input type="file" id="car-image" accept="image/*" />
+
+          <label>Price (Ksh)</label>
+          <input type="number" id="car-price" required />
+
+          <label>Year</label>
+          <input type="number" id="car-year" min="1980" max="2099" required />
+
+          <label>Condition</label>
+          <select id="car-condition" required>
+            <option value="">--Select--</option>
+            <option value="New">New</option>
+            <option value="Used">Used</option>
+          </select>
+
+          <label>Mileage (km)</label>
+          <input type="number" id="car-mileage" required />
+
+          <label>Description</label>
+          <textarea id="car-description" placeholder="Brief description..."></textarea>
+
+          <button type="submit" class="cta-button">Save Car</button>
+        </form>
+
+        <div id="adminMessage" class="form-message" style="display:none;"></div>
+      </section>
+
+      <section class="featured">
+        <h2>Manage Cars</h2>
+        <div id="adminCarList" class="car-list"></div>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2025 Edwin's Auto Hub Admin Panel</p>
+    </footer>
+  </div>
+
+  <script>
+    const apiUrl = "http://localhost:5000/api/cars";
+
+    const form = document.getElementById("adminCarForm");
+    const message = document.getElementById("adminMessage");
+    const carList = document.getElementById("adminCarList");
+
+    const broadcastChannel = new BroadcastChannel("carUpdates");
+
+    // Load Cars
+    function loadCars() {
+      fetch(apiUrl)
+        .then((res) => res.json())
+        .then((cars) => {
+          if (cars.length === 0) {
+            carList.innerHTML = "<p>No cars yet.</p>";
+            return;
+          }
+          carList.innerHTML = cars
+            .map((car) => `
+              <div class="car-card">
+                <img src="${car.image}" alt="${car.name}" />
+                <h3>${car.name}</h3>
+                <p><strong>Ksh:</strong> ${car.price}</p>
+                <p><strong>Year:</strong> ${car.year}</p>
+                <p><strong>${car.condition}</strong>, ${car.mileage} km</p>
+                <p>${car.description}</p>
+                <div style="margin-top: 1rem;">
+                  <button onclick="editCar(${car.id})">✏️ Edit</button>
+                  <button onclick="deleteCar(${car.id})" style="background:red;color:#fff;">🗑️ Delete</button>
+                </div>
+              </div>
+            `)
+            .join(""); 
+        });
+    }
+
+    // Handle Image Upload
+    function handleImageUpload(file) {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve("");
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    // Submit Form
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const id = document.getElementById("car-id").value;
+      const name = document.getElementById("car-name").value;
+      const price = document.getElementById("car-price").value;
+      const year = document.getElementById("car-year").value;
+      const condition = document.getElementById("car-condition").value;
+      const mileage = document.getElementById("car-mileage").value;
+      const description = document.getElementById("car-description").value;
+
+      const imageFile = document.getElementById("car-image").files[0];
+      const image = await handleImageUpload(imageFile);
+
+      const payload = { name, price, year, condition, mileage, description, image };
+
+      const method = id ? "PUT" : "POST";
+      const url = id ? `${apiUrl}/${id}` : apiUrl;
+
+      fetch(url, {
+        method,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      })
+        .then((res) => res.json())
+        .then(() => {
+          message.style.display = "block";
+          message.textContent = id ? "✅ Car updated!" : "✅ Car added!";
+          form.reset();
+          document.getElementById("car-id").value = "";
+          loadCars();
+
+          // ✅ Notify client to refresh listings
+          broadcastChannel.postMessage("refresh");
+        });
+    });
+
+    // Edit Car
+    function editCar(id) {
+      fetch(`${apiUrl}/${id}`)
+        .then((res) => res.json())
+        .then((car) => {
+          document.getElementById("car-id").value = car.id;
+          document.getElementById("car-name").value = car.name;
+          document.getElementById("car-price").value = car.price;
+          document.getElementById("car-year").value = car.year;
+          document.getElementById("car-condition").value = car.condition;
+          document.getElementById("car-mileage").value = car.mileage;
+          document.getElementById("car-description").value = car.description;
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
+    }
+
+    // Delete Car
+    function deleteCar(id) {
+      if (confirm("Are you sure you want to delete this car?")) {
+        fetch(`${apiUrl}/${id}`, {
+          method: "DELETE",
+        })
+          .then((res) => res.json())
+          .then(() => {
+            loadCars();
+            broadcastChannel.postMessage("refresh"); // 💬 Notify client to update
+          });
+      }
+    }
+
+    // Load cars initially
+    loadCars();
+  </script>
+</body>
+</html>

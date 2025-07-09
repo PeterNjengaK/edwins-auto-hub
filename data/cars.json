@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "name": "Toyota Vitz 2020",
+    "price": "Ksh 1,000,000",
+    "image": "../images/sample-car1.jpg",
+    "link": "car-details.html"
+  },
+  {
+    "id": 2,
+    "name": "Mazda Demio 2019",
+    "price": "Ksh 950,000",
+    "image": "../images/sample-car2.jpg",
+    "link": "car-details.html"
+  },
+  {
+    "id": 3,
+    "name": "Subaru Impreza 2018",
+    "price": "Ksh 1,350,000",
+    "image": "../images/sample-car3.jpg",
+    "link": "car-details.html"
+  }
+]

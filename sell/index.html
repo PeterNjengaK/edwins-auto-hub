@@ -1,0 +1,75 @@
+<!-- sell/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sell Your Car | Edwin's Auto Hub</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page-container">
+
+    <!-- Header -->
+    <header>
+      <div class="logo">Edwin's Auto Hub</div>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="../cars/">Cars for Sale</a></li>
+          <li><a href="../about/">About</a></li>
+          <li><a href="../contact/">Contact</a></li>
+          <li><a href="../sell/" class="active">Sell Your Car</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <section class="form-section">
+        <h1>Sell Your Car</h1>
+        <p>Fill in the details below and we’ll get back to you shortly.</p>
+
+        <form id="sellForm" class="sell-form">
+          <label for="name">Your Name</label>
+          <input type="text" id="name" name="name" required>
+
+          <label for="contact">Contact (Phone or Email)</label>
+          <input type="text" id="contact" name="contact" required>
+
+          <label for="make">Car Make</label>
+          <input type="text" id="make" name="make" required>
+
+          <label for="model">Car Model</label>
+          <input type="text" id="model" name="model" required>
+
+          <label for="year">Year</label>
+          <input type="number" id="year" name="year" required>
+
+          <label for="price">Expected Price (Ksh)</label>
+          <input type="number" id="price" name="price" required>
+
+          <label for="image">Upload Car Image</label>
+          <input type="file" id="image" name="image">
+
+          <label for="description">Description</label>
+          <textarea id="description" name="description" rows="4"></textarea>
+
+          <button type="submit" class="cta-button">Submit</button>
+        </form>
+
+        <!-- Feedback message -->
+        <div id="sellMessage" class="form-message" style="display: none;"></div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 Edwin's Auto Hub. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- Load form handling script -->
+  <script src="../script.js"></script>
+</body>
+</html>

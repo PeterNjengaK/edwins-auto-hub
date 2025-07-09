@@ -1,0 +1,342 @@
+/* style.css */
+
+/* GLOBAL RESET */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* STRUCTURE FOR STICKY FOOTER */
+html, body {
+  height: 100%;
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  line-height: 1.6;
+}
+
+.page-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+main {
+  flex: 1;
+}
+
+/* HEADER */
+header {
+  background: #000;
+  color: #fff;
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.logo {
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1rem;
+}
+nav a {
+  color: #fff;
+  text-decoration: none;
+}
+
+/* HERO SECTION */
+.hero {
+  background: url('images/hero-car.jpg') no-repeat center center/cover;
+  color: white;
+  text-align: center;
+  padding: 6rem 2rem;
+}
+.hero h1 {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+.cta-button {
+  background: #ff4d00;
+  color: white;
+  padding: 0.75rem 1.5rem;
+  text-decoration: none;
+  border-radius: 5px;
+  margin-top: 1rem;
+  display: inline-block;
+}
+
+/* FEATURED CARS */
+.featured {
+  padding: 2rem;
+  background: #fff;
+}
+.car-list {
+  display: flex;
+  gap: 2rem;
+  margin-top: 1rem;
+}
+.car-card {
+  background: #eee;
+  padding: 1rem;
+  border-radius: 8px;
+  width: 45%;
+  text-align: center;
+}
+.car-card img {
+  width: 100%;
+  border-radius: 8px;
+}
+
+/* CARS PAGE */
+.page-banner {
+  background: #222;
+  color: white;
+  text-align: center;
+  padding: 3rem 1rem;
+}
+.car-listing {
+  padding: 2rem;
+}
+.car-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+}
+.car-card a {
+  color: inherit;
+  text-decoration: none;
+}
+.car-card:hover {
+  background: #ddd;
+  transition: 0.3s;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 1rem;
+  background: #000;
+  color: white;
+}
+
+/* Car Details Page */
+.car-details {
+  display: flex;
+  flex-wrap: wrap;
+  padding: 2rem;
+  gap: 2rem;
+  background: #fff;
+}
+.car-image {
+  flex: 1 1 400px;
+}
+.car-image img {
+  width: 100%;
+  border-radius: 10px;
+}
+.car-info {
+  flex: 1 1 400px;
+}
+.car-info h1 {
+  font-size: 2rem;
+  margin-bottom: 0.5rem;
+}
+.car-info .price {
+  font-size: 1.5rem;
+  color: #ff4d00;
+  margin-bottom: 1rem;
+}
+.car-info p {
+  margin-bottom: 0.5rem;
+}
+.car-info .description {
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Sell Form Page */
+.form-section {
+  padding: 2rem;
+  max-width: 600px;
+  margin: auto;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+.form-section h1 {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+.sell-form,
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.sell-form label,
+.contact-form label {
+  font-weight: bold;
+}
+.sell-form input,
+.sell-form textarea,
+.contact-form input,
+.contact-form textarea {
+  padding: 0.75rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border 0.2s ease;
+  font-size: 1rem;
+}
+.sell-form input:focus,
+.sell-form textarea:focus,
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #ff4d00;
+  outline: none;
+}
+.sell-form button,
+.contact-form button {
+  align-self: flex-start;
+  background-color: #ff4d00;
+  color: white;
+  padding: 0.75rem 1.25rem;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.sell-form button:hover,
+.contact-form button:hover {
+  background-color: #e84300;
+}
+
+/* Contact Page - Contact Details Section */
+.contact-details {
+  margin-top: 2rem;
+  background: #f0f0f0;
+  padding: 1.5rem;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.contact-details h3 {
+  margin-bottom: 1rem;
+}
+.contact-details p {
+  margin-bottom: 0.5rem;
+}
+
+/* About Page */
+.about-section {
+  padding: 2rem;
+  background: #fff;
+}
+.about-section h1 {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+.about-content {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2rem;
+  align-items: flex-start;
+}
+.about-image {
+  flex: 1 1 300px;
+}
+.about-image img {
+  width: 100%;
+  border-radius: 10px;
+}
+.about-text {
+  flex: 2 1 500px;
+}
+.about-text h2 {
+  margin-top: 1rem;
+  color: #333;
+}
+.about-text p {
+  margin-bottom: 1rem;
+}
+.about-text ul {
+  list-style: none;
+  padding-left: 0;
+}
+.about-text li {
+  background: #f0f0f0;
+  margin-bottom: 0.5rem;
+  padding: 0.5rem;
+  border-left: 4px solid #ff4d00;
+}
+
+/* Form success message */
+.form-message {
+  background: #e0ffe0;
+  color: #006400;
+  padding: 1rem;
+  margin-top: 1rem;
+  border-radius: 5px;
+  font-weight: bold;
+}
+
+/* Admin Car Form - Redesigned Layout */
+#adminCarForm {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem 2rem;
+  padding: 2rem;
+  background: #fdfdfd;
+  border-radius: 12px;
+  margin-bottom: 3rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+#adminCarForm label {
+  grid-column: span 2;
+  font-weight: bold;
+  font-size: 1rem;
+  color: #333;
+}
+
+#adminCarForm input {
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  transition: border 0.2s ease;
+}
+
+#adminCarForm input:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+#adminCarForm button {
+  grid-column: span 2;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  padding: 0.9rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  justify-self: center;
+}
+
+#adminCarForm button:hover {
+  background-color: #0056b3;
+}
+
+@media (max-width: 768px) {
+  #adminCarForm {
+    grid-template-columns: 1fr;
+  }
+  #adminCarForm button {
+    grid-column: span 1;
+    width: 100%;
+  }
+}

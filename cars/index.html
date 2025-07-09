@@ -1,0 +1,94 @@
+<!-- ✅ Updated cars/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cars for Sale | Edwin's Auto Hub</title>
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+  <div class="page-container">
+
+    <!-- Header -->
+    <header>
+      <div class="logo">Edwin's Auto Hub</div>
+      <nav>
+        <ul>
+          <li><a href="../index.html">Home</a></li>
+          <li><a href="index.html" class="active">Cars for Sale</a></li>
+          <li><a href="../about/">About</a></li>
+          <li><a href="../contact/">Contact</a></li>
+          <li><a href="../sell/">Sell Your Car</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <!-- Page Title -->
+      <section class="page-banner">
+        <h1>Browse Our Cars</h1>
+        <p>Quality vehicles, unbeatable prices.</p>
+      </section>
+
+      <!-- Car Listings (dynamic) -->
+      <section class="car-listing">
+        <div class="car-grid" id="carGrid">
+          <!-- Cars will be loaded here -->
+        </div>
+      </section>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+      <p>&copy; 2025 Edwin's Auto Hub. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <!-- Dynamic script for loading cars -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const carGrid = document.getElementById("carGrid");
+
+      function loadCars() {
+        fetch("http://localhost:5000/api/cars")
+          .then((res) => {
+            if (!res.ok) throw new Error("Network response failed");
+            return res.json();
+          })
+          .then((cars) => {
+            if (cars.length === 0) {
+              carGrid.innerHTML = "<p>No cars available yet.</p>";
+              return;
+            }
+
+            carGrid.innerHTML = cars.map(car => `
+              <div class="car-card" onclick="location.href='car-details.html?id=${car.id}'" style="cursor: pointer;">
+                <img src="${car.image}" alt="${car.name}">
+                <h3>${car.name}</h3>
+                <p><strong>Ksh:</strong> ${car.price}</p>
+                <p><em>${car.condition}</em> • ${car.year} • ${car.mileage} km</p>
+                <p>${car.description}</p>
+              </div>
+            `).join('');
+          })
+          .catch((err) => {
+            carGrid.innerHTML = "<p>⚠️ Failed to load cars. Try again later.</p>";
+            console.error("Load error:", err);
+          });
+      }
+
+      loadCars();
+
+      const channel = new BroadcastChannel("carUpdates");
+      channel.onmessage = (e) => {
+        if (e.data === "refresh") {
+          console.log("🔄 Reloading car list after admin update...");
+          loadCars();
+        }
+      };
+    });
+  </script>
+</body>
+</html>
