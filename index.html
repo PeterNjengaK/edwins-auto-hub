@@ -1,61 +1,133 @@
-<!-- index.html -->
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Edwin's Auto Hub</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="page-container">
-
-    <!-- Header / Navigation -->
-    <header>
-      <div class="logo">Edwin's Auto Hub</div>
-      <nav>
-        <ul>
-          <li><a href="index.html">Home</a></li>
-          <li><a href="cars/">Cars for Sale</a></li>
-          <li><a href="about/">About</a></li>
-          <li><a href="contact/">Contact</a></li>
-          <li><a href="sell/">Sell Your Car</a></li>
-        </ul>
-      </nav>
-    </header>
-
-    <main>
-      <!-- Hero Section -->
-      <section class="hero">
-        <h1>Your Ride, Your Pride</h1>
-        <p>Find your perfect car today</p>
-        <a href="cars/" class="cta-button">Browse Cars</a>
-      </section>
-
-      <!-- Featured Cars (Placeholder) -->
-      <section class="featured">
-        <h2>Featured Cars</h2>
-        <div class="car-list">
-          <div class="car-card">
-            <img src="images/sample-car1.jpg" alt="Toyota Vitz">
-            <h3>Toyota Vitz 2020</h3>
-            <p>Ksh 1,000,000</p>
-          </div>
-          <div class="car-card">
-            <img src="images/sample-car2.jpg" alt="Mazda Demio">
-            <h3>Mazda Demio 2019</h3>
-            <p>Ksh 950,000</p>
-          </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#171b1c" />
+    <meta
+      name="description"
+      content="Explore cars, find your next daily driver, or sell your vehicle with Edwin's Auto Hub in Nairobi, Kenya."
+    />
+    <title>Edwin's Auto Hub | Find Your Next Drive</title>
+    <link rel="stylesheet" href="/style.css" />
+    <script src="/vendor/lucide.js" defer></script>
+    <script src="/shared.js" defer></script>
+    <script src="/script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <div class="topbar">
+      <div class="container">
+        <span
+          ><i data-lucide="map-pin"></i> Nairobi, Kenya
+          <span class="topbar-divider">/</span> Your next chapter starts
+          here.</span
+        ><a href="tel:+254708942431"
+          ><i data-lucide="phone"></i> +254 708 942 431</a
+        >
+      </div>
+    </div>
+    <header class="site-header">
+      <div class="container header-inner">
+        <a href="/" class="brand" aria-label="Edwin's Auto Hub home"
+          ><span class="brand-symbol">E<span>.</span></span
+          ><span class="brand-wordmark">EDWIN'S<span>AUTO HUB</span></span></a
+        >
+        <nav id="main-nav" aria-label="Main navigation">
+          <a href="/" data-nav="home">Home</a
+          ><a href="/cars/" data-nav="cars">Find a car</a
+          ><a href="/sell/" data-nav="sell">Sell your car</a
+          ><a href="/about/" data-nav="about">Our story</a
+          ><a href="/contact/" data-nav="contact">Contact</a>
+        </nav>
+        <div class="header-actions">
+          <a
+            class="icon-button saved-link"
+            href="/saved"
+            title="Saved cars"
+            aria-label="Saved cars"
+            ><i data-lucide="heart"></i
+            ><span id="saved-count" hidden>0</span></a
+          ><a href="/contact/" class="button small header-contact"
+            >Let's talk <i data-lucide="arrow-up-right"></i></a
+          ><button
+            class="icon-button menu-toggle"
+            aria-label="Open navigation"
+            aria-expanded="false"
+            aria-controls="main-nav"
+          >
+            <i data-lucide="menu"></i>
+          </button>
         </div>
-      </section>
+      </div>
+    </header>
+    <main id="main" tabindex="-1">
+      <div class="loading-state">
+        <span class="spinner"></span>
+        <p>Getting the keys ready...</p>
+      </div>
     </main>
-
-    <!-- Footer -->
-    <footer>
-      <p>&copy; 2025 Edwin's Auto Hub. All rights reserved.</p>
+    <footer class="site-footer">
+      <div class="container footer-main">
+        <div>
+          <a href="/" class="brand"
+            ><span class="brand-symbol">E<span>.</span></span
+            ><span class="brand-wordmark">EDWIN'S<span>AUTO HUB</span></span></a
+          >
+          <p>
+            Good cars. Real conversations.<br />Your next journey starts with
+            Edwin.
+          </p>
+          <a class="footer-location" href="/contact/"
+            ><i data-lucide="map-pin"></i> Nairobi, Kenya</a
+          >
+        </div>
+        <div>
+          <h3>Explore</h3>
+          <a href="/cars/">Find your next car</a
+          ><a href="/saved">Your saved cars</a
+          ><a href="/sell/">Sell your car</a>
+        </div>
+        <div>
+          <h3>Get to know us</h3>
+          <a href="/about/">Our story</a><a href="/contact/">Get in touch</a
+          ><a href="/privacy">Privacy</a>
+        </div>
+        <div>
+          <h3>Let's talk cars</h3>
+          <a class="footer-phone" href="tel:+254708942431">+254 708 942 431</a
+          ><a href="mailto:peter.njengakihoro@gmail.com"
+            >peter.njengakihoro@gmail.com</a
+          ><a href="https://wa.me/254708942431" target="_blank" rel="noopener"
+            >Chat on WhatsApp <i data-lucide="arrow-up-right"></i
+          ></a>
+        </div>
+      </div>
+      <div class="container footer-bottom">
+        <span>&copy; <span id="year"></span> Edwin's Auto Hub.</span
+        ><span>Made for the road ahead.</span
+        ><a href="/admin/">Admin <i data-lucide="arrow-up-right"></i></a>
+      </div>
     </footer>
-
-  </div>
-  <script src="script.js"></script>
-</body>
+    <dialog id="enquiry-dialog" class="dialog">
+      <div class="dialog-top">
+        <span class="eyebrow">YOUR NEXT STEP</span
+        ><button
+          class="icon-button"
+          data-close-dialog
+          aria-label="Close enquiry"
+        >
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+      <div id="enquiry-content"></div>
+    </dialog>
+    <div id="toast" role="status" class="toast" hidden></div>
+    <noscript
+      ><p class="notice">
+        Please enable JavaScript to browse the catalogue. You can also call +254
+        708 942 431.
+      </p></noscript
+    >
+  </body>
 </html>

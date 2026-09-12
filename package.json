@@ -1,0 +1,25 @@
+{
+  "name": "edwins-auto-hub",
+  "version": "2.0.0",
+  "private": true,
+  "description": "Edwin's Auto Hub dealership website and inventory manager",
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js",
+    "test": "node --test backend/*.test.js",
+    "test:browser": "node tests/browser.cjs && node tests/management-browser.cjs && node tests/session-browser.cjs",
+    "icons": "node tools/generate-app-icons.cjs",
+    "format": "prettier --write index.html style.css script.js shared.js admin/*.html admin/*.css admin/*.js backend/*.js tests/*.cjs README.md"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "lucide": "^0.468.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "prettier": "^3.9.6"
+  }
+}
