@@ -9,6 +9,8 @@ const {
 const fs = require("node:fs");
 const path = require("node:path");
 const seed = require("./seed");
+const catalogueSeed = require("./catalogue-seed");
+const { kind, title: listingTitle, validateProduct } = require("./catalogue");
 const { management, transaction } = require("./management");
 const root = path.join(__dirname, "..");
 const clean = (value, max = 200) =>
@@ -39,7 +41,8 @@ function createApp(options = {}) {
       !production
     ) {
       const insert = db.prepare("INSERT INTO cars VALUES (?, ?)");
-      for (const car of seed) insert.run(car.id, JSON.stringify(car));
+      for (const car of [...seed, ...catalogueSeed])
+        insert.run(car.id, JSON.stringify(car));
     }
     db.prepare("INSERT INTO settings VALUES (?, ?)").run("initialized", "1");
   }
@@ -174,6 +177,25 @@ function createApp(options = {}) {
     return publicData;
   };
   const published = (car) => !["Draft", "Archived"].includes(car.publication);
+  app.get("/api/listings", (req, res) =>
+    res.json(
+      db
+        .prepare("SELECT data FROM cars ORDER BY rowid")
+        .all()
+        .map((r) => JSON.parse(r.data))
+        .filter(published)
+        .map(publicCar),
+    ),
+  );
+  app.get("/api/listings/:id", (req, res) => {
+    const row = db
+      .prepare("SELECT data FROM cars WHERE id=?")
+      .get(req.params.id);
+    const item = row && JSON.parse(row.data);
+    return item && published(item)
+      ? res.json(publicCar(item))
+      : res.status(404).json({ message: "Listing not found." });
+  });
   app.get("/api/health", (req, res) =>
     res.json({ status: "ok", app: "edwins-auto-hub" }),
   );
@@ -184,6 +206,7 @@ function createApp(options = {}) {
         .all()
         .map((row) => JSON.parse(row.data))
         .filter(published)
+        .filter((car) => kind(car) === "vehicle")
         .map(publicCar),
     ),
   );
@@ -191,7 +214,9 @@ function createApp(options = {}) {
     const row = db
       .prepare("SELECT data FROM cars WHERE id = ?")
       .get(req.params.id);
-    return row && published(JSON.parse(row.data))
+    return row &&
+      published(JSON.parse(row.data)) &&
+      kind(JSON.parse(row.data)) === "vehicle"
       ? res.json(publicCar(JSON.parse(row.data)))
       : res.status(404).json({ message: "This vehicle could not be found." });
   });
@@ -239,7 +264,13 @@ function createApp(options = {}) {
     res.json({ ok: true });
   });
   function validateCar(body, existing = {}) {
+    const category = body.category || existing.category || "vehicle";
+    if (category !== "vehicle")
+      return validateProduct(body, existing, safeImage);
+    if (existing.id && kind(existing) !== category)
+      throw new Error("The category of an existing listing cannot be changed.");
     const car = { ...existing };
+    car.category = "vehicle";
     car.publication = body.publication || existing.publication || "Published";
     if (!["Draft", "Published", "Archived"].includes(car.publication))
       throw new Error("Select a valid publication state.");
@@ -273,7 +304,7 @@ function createApp(options = {}) {
       ],
       ["fuel", ["Petrol", "Diesel", "Hybrid", "Electric"]],
       ["transmission", ["Automatic", "Manual"]],
-      ["condition", ["Foreign used", "Locally used", "New"]],
+      ["condition", ["Foreign used", "Locally used", "New", "Used"]],
       ["status", ["Available", "Reserved", "Sold"]],
     ]) {
       if (!values.includes(body[key]))
@@ -315,7 +346,7 @@ function createApp(options = {}) {
         car.id,
         JSON.stringify(car),
       );
-      audit("Vehicle added", `${car.make} ${car.model}`);
+      audit("Listing added", listingTitle(car));
       res.status(201).json(car);
     } catch (error) {
       res.status(400).json({ message: error.message });
@@ -354,7 +385,7 @@ function createApp(options = {}) {
             }
           }
         }
-        audit("Vehicle updated", `${car.make} ${car.model}`);
+        audit("Listing updated", listingTitle(car));
       });
       res.json(car);
     } catch (error) {
@@ -367,7 +398,7 @@ function createApp(options = {}) {
       .get(req.params.id);
     if (row && JSON.parse(row.data).saleId)
       return res.status(409).json({
-        message: "Vehicles with recorded sales must be archived, not deleted.",
+        message: "Listings with recorded sales must be archived, not deleted.",
       });
     if (
       db
@@ -379,7 +410,7 @@ function createApp(options = {}) {
         })
     )
       return res.status(409).json({
-        message: "Cancel scheduled viewings before deleting this vehicle.",
+        message: "Cancel scheduled viewings before deleting this listing.",
       });
     const result = transaction(db, () => {
       const result = db
@@ -396,12 +427,12 @@ function createApp(options = {}) {
             );
           }
         }
-        audit("Vehicle deleted", req.params.id);
+        audit("Listing deleted", req.params.id);
       }
       return result;
     });
     res.status(result.changes ? 200 : 404).json({
-      message: result.changes ? "Vehicle deleted." : "Vehicle not found.",
+      message: result.changes ? "Listing deleted." : "Vehicle not found.",
     });
   });
   app.post(
@@ -431,26 +462,26 @@ function createApp(options = {}) {
         return res
           .status(400)
           .json({ message: "Please enter a valid phone number." });
-      const type = ["vehicle", "sell", "contact"].includes(b.type)
+      const type = ["vehicle", "listing", "sell", "contact"].includes(b.type)
         ? b.type
         : "contact";
       let vehicle = null;
-      if (type === "vehicle") {
+      if (type === "vehicle" || type === "listing") {
         const row = db
           .prepare("SELECT data FROM cars WHERE id = ?")
           .get(clean(b.carId));
         if (!row)
           return res
             .status(400)
-            .json({ message: "This vehicle is no longer listed." });
+            .json({ message: "This listing is no longer listed." });
         const car = JSON.parse(row.data);
         if (!published(car) || car.status === "Sold")
           return res
             .status(409)
-            .json({ message: "This vehicle is not available for enquiries." });
-        vehicle = `${car.year} ${car.make} ${car.model}${car.demo ? " (sample)" : ""}`;
+            .json({ message: "This listing is not available for enquiries." });
+        vehicle = `${listingTitle(car)}${car.demo ? " (sample)" : ""}`;
       }
-      const details =
+      let details =
         type === "sell"
           ? {
               make: clean(b.make, 80),
@@ -458,10 +489,19 @@ function createApp(options = {}) {
               year: Number(b.year),
               price: Number(b.price),
               mileage: Number(b.mileage),
+              condition: [
+                "New",
+                "Used",
+                "Foreign used",
+                "Locally used",
+              ].includes(b.condition)
+                ? b.condition
+                : "Used",
             }
           : null;
       if (
         details &&
+        (!b.category || b.category === "vehicle") &&
         (!details.make ||
           !details.model ||
           !Number.isInteger(details.year) ||
@@ -476,6 +516,25 @@ function createApp(options = {}) {
           message: "Please complete the vehicle details with valid values.",
         });
       const images = type === "sell" && Array.isArray(b.images) ? b.images : [];
+      if (type === "sell" && b.category && b.category !== "vehicle") {
+        try {
+          details = validateProduct(
+            {
+              ...b,
+              title: b.listingTitle,
+              publication: "Draft",
+              status: "Available",
+              images,
+              features: [],
+              featured: false,
+            },
+            {},
+            safeImage,
+          );
+        } catch (error) {
+          return res.status(400).json({ message: error.message });
+        }
+      }
       if (images.length > 4 || !images.every(safeImage))
         return res.status(400).json({
           message: "Please use up to four JPG, PNG, or WebP images, 2 MB each.",
@@ -490,6 +549,7 @@ function createApp(options = {}) {
         vehicle,
         carId: clean(b.carId),
         details,
+        category: type === "sell" ? b.category || "vehicle" : undefined,
         images,
         status: "New",
         createdAt: new Date().toISOString(),
@@ -548,6 +608,9 @@ function createApp(options = {}) {
     "admin/management.css",
     "admin/install.js",
     "admin/session.js",
+    "catalogue.js",
+    "catalogue.css",
+    "admin/catalogue.js",
     "admin/sw.js",
     "admin/manifest.webmanifest",
     "admin/offline.html",
@@ -575,6 +638,10 @@ function createApp(options = {}) {
       "/about/",
       "/about/index.html",
       "/privacy",
+      "/catalogue/",
+      "/parts/",
+      "/properties/",
+      "/listing/",
     ],
     (req, res) => res.sendFile(path.join(root, "index.html")),
   );

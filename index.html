@@ -6,12 +6,14 @@
     <meta name="theme-color" content="#171b1c" />
     <meta
       name="description"
-      content="Explore cars, find your next daily driver, or sell your vehicle with Edwin's Auto Hub in Nairobi, Kenya."
+      content="Explore new and used cars, car parts, land, plots and houses with Edwin's Auto Hub in Nairobi, Kenya."
     />
-    <title>Edwin's Auto Hub | Find Your Next Drive</title>
+    <title>Edwin's Auto Hub | Cars, Parts & Property</title>
     <link rel="stylesheet" href="/style.css" />
+    <link rel="stylesheet" href="/catalogue.css" />
     <script src="/vendor/lucide.js" defer></script>
     <script src="/shared.js" defer></script>
+    <script src="/catalogue.js" defer></script>
     <script src="/script.js" defer></script>
   </head>
   <body>
@@ -36,16 +38,17 @@
         <nav id="main-nav" aria-label="Main navigation">
           <a href="/" data-nav="home">Home</a
           ><a href="/cars/" data-nav="cars">Find a car</a
-          ><a href="/sell/" data-nav="sell">Sell your car</a
-          ><a href="/about/" data-nav="about">Our story</a
+          ><a href="/parts/" data-nav="parts">Car parts</a
+          ><a href="/properties/" data-nav="properties">Property</a
+          ><a href="/sell/" data-nav="sell">Sell with us</a
           ><a href="/contact/" data-nav="contact">Contact</a>
         </nav>
         <div class="header-actions">
           <a
             class="icon-button saved-link"
             href="/saved"
-            title="Saved cars"
-            aria-label="Saved cars"
+            title="Saved listings"
+            aria-label="Saved listings"
             ><i data-lucide="heart"></i
             ><span id="saved-count" hidden>0</span></a
           ><a href="/contact/" class="button small header-contact"
@@ -75,7 +78,7 @@
             ><span class="brand-wordmark">EDWIN'S<span>AUTO HUB</span></span></a
           >
           <p>
-            Good cars. Real conversations.<br />Your next journey starts with
+            Cars, parts, land and homes.<br />Your next journey starts with
             Edwin.
           </p>
           <a class="footer-location" href="/contact/"
@@ -84,9 +87,11 @@
         </div>
         <div>
           <h3>Explore</h3>
-          <a href="/cars/">Find your next car</a
-          ><a href="/saved">Your saved cars</a
-          ><a href="/sell/">Sell your car</a>
+          <a href="/catalogue/">All listings</a><a href="/parts/">Car parts</a
+          ><a href="/properties/">Land & houses</a
+          ><a href="/cars/">Find your next car</a
+          ><a href="/saved">Your saved listings</a
+          ><a href="/sell/">Sell with us</a>
         </div>
         <div>
           <h3>Get to know us</h3>
@@ -94,7 +99,7 @@
           ><a href="/privacy">Privacy</a>
         </div>
         <div>
-          <h3>Let's talk cars</h3>
+          <h3>Let's talk</h3>
           <a class="footer-phone" href="tel:+254708942431">+254 708 942 431</a
           ><a href="mailto:peter.njengakihoro@gmail.com"
             >peter.njengakihoro@gmail.com</a
@@ -105,7 +110,7 @@
       </div>
       <div class="container footer-bottom">
         <span>&copy; <span id="year"></span> Edwin's Auto Hub.</span
-        ><span>Made for the road ahead.</span
+        ><span>Your next chapter starts here.</span
         ><a href="/admin/">Admin <i data-lucide="arrow-up-right"></i></a>
       </div>
     </footer>

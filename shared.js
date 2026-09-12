@@ -27,7 +27,7 @@ window.Hub = {
     while ((node = walker.nextNode())) {
       if (
         node.parentElement?.closest(
-          "script,style,textarea,.car-card,.enquiry-item",
+          "script,style,textarea,.car-card,.listing-card,.listing-specs,.enquiry-item",
         )
       )
         continue;

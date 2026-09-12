@@ -1,0 +1,165 @@
+.category-band {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  padding-top: 32px;
+  padding-bottom: 32px;
+}
+.category-tile {
+  min-width: 0;
+  border-bottom: 2px solid #dce2df;
+  padding-bottom: 16px;
+}
+.category-tile img {
+  width: 100%;
+  aspect-ratio: 5/3;
+  object-fit: cover;
+}
+.category-tile div {
+  position: relative;
+  padding: 14px 28px 0 0;
+}
+.category-tile h2 {
+  font-size: 21px;
+  margin: 0 0 4px;
+}
+.category-tile span {
+  font-size: 14px;
+  color: #56625d;
+}
+.category-tile svg {
+  position: absolute;
+  right: 0;
+  top: 18px;
+  width: 20px;
+}
+.marketplace h1 {
+  font-size: 38px;
+}
+.listing-filters {
+  display: grid;
+  grid-template-columns: 2fr repeat(2, 1fr);
+  gap: 16px;
+  padding: 24px 0;
+  border-top: 1px solid #dce2df;
+  border-bottom: 1px solid #dce2df;
+  margin-bottom: 24px;
+}
+.listing-filters .button {
+  justify-self: start;
+}
+.listing-card {
+  border: 1px solid #dce2df;
+  border-radius: 6px;
+  overflow: hidden;
+  min-width: 0;
+  background: #fff;
+}
+.listing-card h3 {
+  font-size: 21px;
+  line-height: 1.35;
+  margin: 12px 0;
+  overflow-wrap: anywhere;
+}
+.listing-card .car-meta {
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.listing-spec {
+  color: #56625d;
+  font-size: 14px;
+  line-height: 1.6;
+  overflow-wrap: anywhere;
+  margin: 8px 0;
+}
+.listing-price {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  border-top: 1px solid #e3e7e5;
+  margin-top: 18px;
+  padding-top: 14px;
+}
+.listing-price strong {
+  font-size: 21px;
+}
+.listing-price .icon-button {
+  margin-left: auto;
+}
+.listing-price small {
+  color: #56625d;
+}
+.listing-specs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 24px 0;
+  gap: 0 24px;
+}
+.listing-specs div {
+  border-bottom: 1px solid #dce2df;
+  padding: 16px 0;
+  min-width: 0;
+}
+.listing-specs dt {
+  color: #56625d;
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+.listing-specs dd {
+  margin: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+.inventory-filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.inventory-filters .field {
+  min-width: 150px;
+  flex: 1;
+}
+.category-tile:focus-visible {
+  outline: 2px solid #1d6750;
+  outline-offset: 5px;
+}
+.category-report {
+  margin-top: 32px;
+}
+@media (max-width: 1000px) {
+  .category-band {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .header-contact {
+    display: none;
+  }
+}
+@media (max-width: 600px) {
+  .listing-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .listing-filters .field:first-child {
+    grid-column: 1/-1;
+  }
+  .category-band {
+    gap: 16px;
+  }
+  .category-tile h2 {
+    font-size: 18px;
+  }
+  .marketplace h1 {
+    font-size: 30px;
+  }
+  .marketplace .section-head {
+    align-items: start;
+    gap: 18px;
+    flex-direction: column;
+  }
+  .listing-specs {
+    gap: 0 16px;
+  }
+}

@@ -61,17 +61,17 @@ const { createApp } = require("../backend/app");
     assert.equal(await page.locator(".car-card").count(), 3);
     await checkLayout("home-desktop");
     await page.getByRole("button", { name: "SUVs", exact: true }).click();
-    assert.equal(await page.locator(".car-card").count(), 1);
+    assert.equal(await page.locator(".car-card, .listing-card").count(), 1);
     await page.getByRole("button", { name: "All cars", exact: true }).click();
     await page.locator("[data-save]").first().click();
     await page.goto("/saved");
-    await page.locator(".car-card").waitFor();
-    assert.equal(await page.locator(".car-card").count(), 1);
+    await page.locator(".listing-card").waitFor();
+    assert.equal(await page.locator(".car-card, .listing-card").count(), 1);
     await page.reload();
-    await page.locator(".car-card").waitFor();
+    await page.locator(".listing-card").waitFor();
     await page.goto("/cars/");
     await page.locator("#filter-make").selectOption("Toyota");
-    assert.equal(await page.locator(".car-card").count(), 1);
+    assert.equal(await page.locator(".car-card, .listing-card").count(), 1);
     await page.locator("#filter-max").selectOption("1500000");
     await page.getByText("No cars match just yet.").waitFor();
     await page
@@ -112,12 +112,12 @@ const { createApp } = require("../backend/app");
       .getByLabel("Condition and other details")
       .fill("Well maintained test vehicle.");
     await page.locator('[name="consent"]').check();
-    await page.getByRole("button", { name: "Submit your vehicle" }).click();
+    await page.getByRole("button", { name: "Submit your listing" }).click();
     await page.locator(".form-status.success").waitFor();
     await page.goto("/admin/");
     await page.getByLabel("Admin password", { exact: true }).fill(password);
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
-    await page.getByRole("heading", { name: "Dealership overview" }).waitFor();
+    await page.getByRole("heading", { name: "Business overview" }).waitFor();
     await checkLayout("admin-desktop");
     await page.getByRole("button", { name: "Enquiries", exact: true }).click();
     assert.equal(await page.locator(".enquiry-item").count(), 2);
@@ -127,7 +127,7 @@ const { createApp } = require("../backend/app");
       .selectOption("In progress");
     await page.getByRole("button", { name: "Inventory", exact: true }).click();
     await page
-      .getByRole("button", { name: "Add vehicle", exact: true })
+      .getByRole("button", { name: "Add listing", exact: true })
       .click();
     await page.getByLabel("Make", { exact: true }).fill("Test");
     await page.getByLabel("Model", { exact: true }).fill("Roadster");
@@ -196,7 +196,7 @@ const { createApp } = require("../backend/app");
       .click();
     await page.getByRole("button", { name: "Filter cars" }).click();
     await page.locator("#filter-body").selectOption("SUV");
-    assert.equal(await page.locator(".car-card").count(), 1);
+    assert.equal(await page.locator(".car-card, .listing-card").count(), 1);
     assert.deepEqual(errors, [], "Browser console errors");
     console.log(
       "PASS: browsing, filters, saved cars, enquiries, seller form, admin CRUD, image preservation, enquiry status, logout, mobile navigation, and responsive screenshots.",

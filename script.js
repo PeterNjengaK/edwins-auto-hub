@@ -31,13 +31,13 @@ function updateSaved() {
     button.setAttribute("aria-pressed", active);
     button.setAttribute(
       "aria-label",
-      active ? "Remove from saved cars" : "Save car",
+      active ? "Remove from saved listings" : "Save listing",
     );
-    button.title = active ? "Remove from saved cars" : "Save car";
+    button.title = active ? "Remove from saved listings" : "Save listing";
   });
 }
 function card(car) {
-  return `<article class="car-card"><div class="car-photo"><a href="${detailUrl(car)}" aria-label="View ${esc(nameOf(car))}"><img src="${esc(car.image)}" alt="${esc(nameOf(car))}${car.demo ? " - illustrative photo" : ""}" loading="lazy" width="700" height="450"></a><span class="photo-badge">${esc(car.status === "Available" ? car.condition : car.status)}</span><button class="icon-button save-button" data-save="${esc(car.id)}" aria-label="Save car">${icon("heart")}</button>${car.demo ? '<span class="demo-label">Sample vehicle</span>' : ""}</div><div class="car-content"><div class="car-meta"><span>${esc(car.year)}</span><span>${esc(car.body)}</span></div><h3><a href="${detailUrl(car)}">${esc(nameOf(car))}</a></h3><div class="car-specs"><span>${icon("gauge")}${number(car.mileage)} km</span><span>${icon("settings-2")}${esc(car.transmission)}</span><span>${icon("fuel")}${esc(car.fuel)}</span></div><div class="car-bottom"><strong class="car-price">${money(car.price)}</strong><a href="${detailUrl(car)}" aria-label="View ${esc(nameOf(car))}" title="View vehicle">${icon("arrow-up-right")}</a></div></div></article>`;
+  return `<article class="car-card"><div class="car-photo"><a href="${detailUrl(car)}" aria-label="View ${esc(nameOf(car))}"><img src="${esc(car.image)}" alt="${esc(nameOf(car))}${car.demo ? " - illustrative photo" : ""}" loading="lazy" width="700" height="450"></a><span class="photo-badge">${esc(car.status === "Available" ? car.condition : car.status)}</span><button class="icon-button save-button" data-save="${esc(car.id)}" aria-label="Save listing">${icon("heart")}</button>${car.demo ? '<span class="demo-label">Sample vehicle</span>' : ""}</div><div class="car-content"><div class="car-meta"><span>${esc(car.year)}</span><span>${esc(car.body)}</span></div><h3><a href="${detailUrl(car)}">${esc(nameOf(car))}</a></h3><div class="car-specs"><span>${icon("gauge")}${number(car.mileage)} km</span><span>${icon("settings-2")}${esc(car.transmission)}</span><span>${icon("fuel")}${esc(car.fuel)}</span></div><div class="car-bottom"><strong class="car-price">${money(car.price)}</strong><a href="${detailUrl(car)}" aria-label="View ${esc(nameOf(car))}" title="View vehicle">${icon("arrow-up-right")}</a></div></div></article>`;
 }
 function refreshUI() {
   Hub.icons();
@@ -45,7 +45,7 @@ function refreshUI() {
   Hub.applyBusiness();
 }
 function home() {
-  main.innerHTML = `<section class="hero"><img class="hero-photo" src="/images/mercedes.jpg" alt="Silver Mercedes-Benz photographed on an open road" fetchpriority="high" width="1600" height="1067"><div class="container hero-content"><span class="eyebrow">NAIROBI ROOTS. OPEN-ROAD POSSIBILITIES.</span><h1>Edwin's Auto Hub<span>Your next drive. A better beginning.</span></h1><p>From the everyday commute to the long way home. Find a car that feels like you.</p><div class="hero-links"><a class="button" href="/cars/">Find your next car ${icon("arrow-up-right")}</a><a class="text-link" href="/sell/">Sell your car ${icon("arrow-right")}</a></div><div class="hero-bottom"><span class="hero-note">${icon("map-pin")} Based in Nairobi. Here for your next move.</span></div></div><span class="hero-caption">The collection / illustrative photography</span></section>
+  main.innerHTML = `<section class="hero"><img class="hero-photo" src="/images/mercedes.jpg" alt="Silver Mercedes-Benz photographed on an open road" fetchpriority="high" width="1600" height="1067"><div class="container hero-content"><span class="eyebrow">CARS. PARTS. LAND. HOMES.</span><h1>Edwin's Auto Hub<span>Your next drive. A better beginning.</span></h1><p>New and used cars and parts. Land, plots and homes. Explore your next move with Edwin.</p><div class="hero-links"><a class="button" href="/cars/">Find your next car ${icon("arrow-up-right")}</a><a class="text-link" href="/sell/">Sell your car ${icon("arrow-right")}</a></div><div class="hero-bottom"><span class="hero-note">${icon("map-pin")} Based in Nairobi. Here for your next move.</span></div></div><span class="hero-caption">The collection / illustrative photography</span></section>
   <section class="search-band" aria-label="Find a vehicle"><form id="quick-search" class="container quick-search"><div class="field"><label for="quick-make">Choose a make</label><select id="quick-make" name="make">${options([...new Set(cars.map((c) => c.make))].sort(), "", "All makes")}</select></div><div class="field"><label for="quick-body">Your kind of car</label><select id="quick-body" name="body">${options(["Sedan", "SUV", "Hatchback", "Coupe", "Pickup"], "", "All body types")}</select></div><div class="field"><label for="quick-budget">Your budget</label><select id="quick-budget" name="max">${budgetOptions()}</select></div><button class="button dark" type="submit">${icon("search")} Search cars</button></form></section>
   <div class="trust-strip"><div class="container trust-inner"><span class="trust-item">${icon("car-front")} Cars for your everyday</span><span class="trust-item">${icon("messages-square")} A real person to talk to</span><span class="trust-item">${icon("banknote")} Prices in Kenya shillings</span><span class="trust-item">${icon("key-round")} Viewings by appointment</span></div></div>
   <section class="section container"><div class="section-head"><div><span class="eyebrow">FIND YOUR NEXT CHAPTER</span><h2>A good place to start.</h2><p>Different drives. One destination: the right car for you.</p></div><a href="/cars/" class="text-link">Explore all cars ${icon("arrow-up-right")}</a></div><div class="body-tabs" role="group" aria-label="Vehicle body type"><button class="body-tab active" data-home-body="" aria-pressed="true">All cars</button>${["Sedan", "SUV", "Coupe"].map((b) => `<button class="body-tab" data-home-body="${b}" aria-pressed="false">${icon(b === "SUV" ? "truck" : "car-front")}${b === "SUV" ? "SUVs" : b + "s"}</button>`).join("")}</div><div class="cars-grid" id="featured-grid"></div>${cars.some((c) => c.demo) ? sampleNote : ""}</section>
@@ -112,6 +112,18 @@ function catalogue(savedOnly = false) {
     ? query.get("sort")
     : "featured";
   const apply = () => applyFilters(savedOnly);
+  document
+    .getElementById("filter-form")
+    .insertAdjacentHTML(
+      "beforeend",
+      Listings.select(
+        "Condition",
+        "condition",
+        [["", "Any condition"], "New", "Used"],
+        query.get("condition") || "",
+        "filter",
+      ),
+    );
   document.getElementById("filter-form").addEventListener("input", apply);
   document
     .getElementById("filter-form")
@@ -143,6 +155,8 @@ function applyFilters(savedOnly = false) {
           .toLowerCase()
           .includes(values.q.toLowerCase())) &&
       (!values.make || c.make === values.make) &&
+      (!values.condition ||
+        (c.condition === "New" ? "New" : "Used") === values.condition) &&
       (!values.body || c.body === values.body) &&
       (!values.fuel || c.fuel === values.fuel) &&
       (!values.transmission || c.transmission === values.transmission) &&
@@ -278,7 +292,7 @@ function openEnquiry(id) {
 }
 function formPage(sell = false) {
   document.title = `${sell ? "Sell your car" : "Contact"} | Edwin's Auto Hub`;
-  main.innerHTML = `<div class="container form-page"><section class="form-intro"><span class="eyebrow">${sell ? "MAKE ROOM FOR WHAT'S NEXT" : "GOOD CONVERSATIONS START HERE"}</span><h1>${sell ? "Your car has another chapter." : "Let's find your next drive."}</h1><p>${sell ? "Tell us a little about your vehicle. We'll review the details and get in touch to discuss the possibilities." : "A question about a car? Something specific on your wish list? Reach out. We're here to talk it through."}</p>${sell ? `<div class="steps"><div class="step"><span class="step-number">01</span><div><h3>Tell us about your car</h3><p>Share the basics, your asking price, and a few clear photos.</p></div></div><div class="step"><span class="step-number">02</span><div><h3>Have a conversation</h3><p>We'll discuss the condition, history, and your expectations.</p></div></div><div class="step"><span class="step-number">03</span><div><h3>Agree on the next steps</h3><p>Arrange a viewing and discuss an approach that works for you.</p></div></div></div>` : `<div class="contact-options"><div class="contact-option">${icon("phone")}<div><strong>Give us a call</strong><a href="tel:+254708942431">+254 708 942 431</a></div></div><div class="contact-option">${icon("message-circle")}<div><strong>A quick chat?</strong><a href="https://wa.me/254708942431" target="_blank" rel="noopener">Find us on WhatsApp ${icon("arrow-up-right")}</a></div></div><div class="contact-option">${icon("mail")}<div><strong>Drop us a line</strong><a href="mailto:peter.njengakihoro@gmail.com">peter.njengakihoro@gmail.com</a></div></div><div class="contact-option">${icon("map-pin")}<div><strong>Nairobi, Kenya</strong><p>Viewings by appointment. Contact us for a meeting point.</p></div></div></div>`}</section><section class="form-panel"><h2>${sell ? "Tell us what you're driving." : "What's on your mind?"}</h2><p>${sell ? "Your details stay private. Submissions are reviewed before any listing is published." : "Leave your details and a message for Edwin."}</p><form id="public-form"><div class="form-grid">${contactFields()}${sell ? `<div class="field"><label for="make">Car make</label><input id="make" name="make" required maxlength="80" placeholder="e.g. Toyota"></div><div class="field"><label for="model">Model</label><input id="model" name="model" required maxlength="80" placeholder="e.g. Fielder"></div><div class="field"><label for="vehicle-year">Year of manufacture</label><input id="vehicle-year" name="year" type="number" required min="1950" max="${new Date().getFullYear() + 1}" placeholder="2019"></div><div class="field"><label for="mileage">Mileage (km)</label><input id="mileage" name="mileage" type="number" required min="0" max="2000000" placeholder="45000"></div><div class="field span-2"><label for="price">Your asking price (KSh)</label><input id="price" name="price" type="number" required min="1" max="1000000000" placeholder="1500000"></div><div class="field span-2"><label for="photos">Vehicle photos (optional)</label><div class="upload-box">${icon("image-plus")}<input id="photos" name="photos" type="file" multiple accept="image/jpeg,image/png,image/webp"></div><small>Up to 4 photos. JPG, PNG or WebP. 2 MB per photo.</small></div>` : ""}<div class="field span-2"><label for="message">${sell ? "Condition and other details" : "Your message"}</label><textarea id="message" name="message" required maxlength="4000" placeholder="${sell ? "Tell us about the condition, service history, and anything else we should know." : "Tell us how we can help."}"></textarea></div>${consent()}<button type="submit" class="button span-2">${sell ? "Submit your vehicle" : "Send message"} ${icon("arrow-up-right")}</button></div><div class="form-status" role="status" tabindex="-1"></div></form></section></div>`;
+  main.innerHTML = `<div class="container form-page"><section class="form-intro"><span class="eyebrow">${sell ? "MAKE ROOM FOR WHAT'S NEXT" : "GOOD CONVERSATIONS START HERE"}</span><h1>${sell ? "Your car has another chapter." : "Let's discuss your next move."}</h1><p>${sell ? "Tell us a little about your vehicle. We'll review the details and get in touch to discuss the possibilities." : "A question about a car, part, land or house? Something specific on your wish list? Reach out. We're here to talk it through."}</p>${sell ? `<div class="steps"><div class="step"><span class="step-number">01</span><div><h3>Tell us about your car</h3><p>Share the basics, your asking price, and a few clear photos.</p></div></div><div class="step"><span class="step-number">02</span><div><h3>Have a conversation</h3><p>We'll discuss the condition, history, and your expectations.</p></div></div><div class="step"><span class="step-number">03</span><div><h3>Agree on the next steps</h3><p>Arrange a viewing and discuss an approach that works for you.</p></div></div></div>` : `<div class="contact-options"><div class="contact-option">${icon("phone")}<div><strong>Give us a call</strong><a href="tel:+254708942431">+254 708 942 431</a></div></div><div class="contact-option">${icon("message-circle")}<div><strong>A quick chat?</strong><a href="https://wa.me/254708942431" target="_blank" rel="noopener">Find us on WhatsApp ${icon("arrow-up-right")}</a></div></div><div class="contact-option">${icon("mail")}<div><strong>Drop us a line</strong><a href="mailto:peter.njengakihoro@gmail.com">peter.njengakihoro@gmail.com</a></div></div><div class="contact-option">${icon("map-pin")}<div><strong>Nairobi, Kenya</strong><p>Viewings by appointment. Contact us for a meeting point.</p></div></div></div>`}</section><section class="form-panel"><h2>${sell ? "Tell us what you're driving." : "What's on your mind?"}</h2><p>${sell ? "Your details stay private. Submissions are reviewed before any listing is published." : "Leave your details and a message for Edwin."}</p><form id="public-form"><div class="form-grid">${contactFields()}${sell ? `<div class="field"><label for="make">Car make</label><input id="make" name="make" required maxlength="80" placeholder="e.g. Toyota"></div><div class="field"><label for="model">Model</label><input id="model" name="model" required maxlength="80" placeholder="e.g. Fielder"></div><div class="field"><label for="vehicle-year">Year of manufacture</label><input id="vehicle-year" name="year" type="number" required min="1950" max="${new Date().getFullYear() + 1}" placeholder="2019"></div><div class="field"><label for="mileage">Mileage (km)</label><input id="mileage" name="mileage" type="number" required min="0" max="2000000" placeholder="45000"></div><div class="field span-2"><label for="price">Your asking price (KSh)</label><input id="price" name="price" type="number" required min="1" max="1000000000" placeholder="1500000"></div><div class="field span-2"><label for="photos">Vehicle photos (optional)</label><div class="upload-box">${icon("image-plus")}<input id="photos" name="photos" type="file" multiple accept="image/jpeg,image/png,image/webp"></div><small>Up to 4 photos. JPG, PNG or WebP. 2 MB per photo.</small></div>` : ""}<div class="field span-2"><label for="message">${sell ? "Condition and other details" : "Your message"}</label><textarea id="message" name="message" required maxlength="4000" placeholder="${sell ? "Tell us about the condition, service history, and anything else we should know." : "Tell us how we can help."}"></textarea></div>${consent()}<button type="submit" class="button span-2">${sell ? "Submit your vehicle" : "Send message"} ${icon("arrow-up-right")}</button></div><div class="form-status" role="status" tabindex="-1"></div></form></section></div>`;
   bindEnquiry(
     document.getElementById("public-form"),
     sell ? "sell" : "contact",
@@ -286,11 +300,11 @@ function formPage(sell = false) {
 }
 function about() {
   document.title = "Our story | Edwin's Auto Hub";
-  main.innerHTML = `<section class="section container"><div class="story-heading"><span class="eyebrow">NAIROBI ROOTS. A PASSION FOR THE ROAD.</span><h1>Good cars.<br>Real conversations.</h1><p>Edwin's Auto Hub brings a personal approach to buying and selling cars in Nairobi. It starts with understanding what you need, and taking the time to find the right next step.</p></div><img class="story-image" src="/images/bmw.jpg" alt="A silver BMW on an open stretch of road" width="1240" height="420"><div class="story-values"><div>${icon("messages-square")}<h3>People before paperwork.</h3><p>A first car, a family upgrade, or something just for you. We want to hear the story behind your search.</p></div><div>${icon("scan-search")}<h3>Room for every question.</h3><p>From the mileage to the maintenance history, ask what matters to you. Discuss inspection arrangements before deciding.</p></div><div>${icon("compass")}<h3>Your journey, your decision.</h3><p>Explore the options, arrange a viewing, and choose at your own pace. We're here to help you move forward.</p></div></div></section><section class="sell-band"><div class="container"><div><span class="eyebrow">LET'S GET STARTED</span><h2>The right car starts with a conversation.</h2></div><a class="button dark" href="/contact/">Meet your next move ${icon("arrow-up-right")}</a></div></section>`;
+  main.innerHTML = `<section class="section container"><div class="story-heading"><span class="eyebrow">NAIROBI ROOTS. A PASSION FOR THE ROAD.</span><h1>Good cars.<br>Real conversations.</h1><p>Edwin's Auto Hub brings a personal approach to buying and selling cars, car parts, land, plots and houses in Kenya. It starts with understanding what you need, and taking the time to find the right next step.</p></div><img class="story-image" src="/images/bmw.jpg" alt="A silver BMW on an open stretch of road" width="1240" height="420"><div class="story-values"><div>${icon("messages-square")}<h3>People before paperwork.</h3><p>A first car, a family upgrade, or something just for you. We want to hear the story behind your search.</p></div><div>${icon("scan-search")}<h3>Room for every question.</h3><p>From the mileage to the maintenance history, ask what matters to you. Discuss inspection arrangements before deciding.</p></div><div>${icon("compass")}<h3>Your journey, your decision.</h3><p>Explore the options, arrange a viewing, and choose at your own pace. We're here to help you move forward.</p></div></div></section><section class="sell-band"><div class="container"><div><span class="eyebrow">LET'S GET STARTED</span><h2>The right car starts with a conversation.</h2></div><a class="button dark" href="/contact/">Meet your next move ${icon("arrow-up-right")}</a></div></section>`;
 }
 function privacy() {
   document.title = "Privacy | Edwin's Auto Hub";
-  main.innerHTML = `<section class="section container prose"><span class="eyebrow">YOUR INFORMATION</span><h1>Privacy notice</h1><h2>What we collect</h2><p>When you send an enquiry, we collect the name, email, optional phone number, message, and vehicle information or photos you provide. Please do not upload identification documents or financial records.</p><h2>Why we collect it</h2><p>Your information is used to respond to your enquiry, discuss a vehicle, or review a car you wish to sell. Seller submissions are private and are not automatically published.</p><h2>Storage and access</h2><p>In this local preview, enquiries are stored on the computer running this website and are accessible through the password-protected admin dashboard. No automated email is sent. Hosting, retention, and any additional service providers will be confirmed before public launch.</p><h2>Saved cars and sessions</h2><p>Saved car IDs are kept in your browser's local storage. Admin sign-in uses an essential session cookie. This website does not include advertising trackers or analytics.</p><h2>External services</h2><p>WhatsApp and email links open your chosen service, whose own privacy terms apply. Vehicle images supplied as external links are loaded from their source websites.</p><h2>Contact and deletion requests</h2><p>To request access, correction, or deletion of your enquiry, contact <a href="mailto:peter.njengakihoro@gmail.com">peter.njengakihoro@gmail.com</a> or call +254 708 942 431. A final retention policy will be established before launch.</p></section>`;
+  main.innerHTML = `<section class="section container prose"><span class="eyebrow">YOUR INFORMATION</span><h1>Privacy notice</h1><h2>What we collect</h2><p>When you send an enquiry, we collect the name, email, optional phone number, message, and listing information or photos you provide. Please do not upload identification documents or financial records.</p><h2>Why we collect it</h2><p>Your information is used to respond to your enquiry, discuss a listing, or review a car, part or property you wish to sell. Seller submissions are private and are not automatically published.</p><h2>Storage and access</h2><p>In this local preview, enquiries are stored on the computer running this website and are accessible through the password-protected admin dashboard. No automated email is sent. Hosting, retention, and any additional service providers will be confirmed before public launch.</p><h2>Saved listings and sessions</h2><p>Saved listing IDs are kept in your browser's local storage. Admin sign-in uses an essential session cookie. This website does not include advertising trackers or analytics.</p><h2>External services</h2><p>WhatsApp and email links open your chosen service, whose own privacy terms apply. Vehicle images supplied as external links are loaded from their source websites.</p><h2>Contact and deletion requests</h2><p>To request access, correction, or deletion of your enquiry, contact <a href="mailto:peter.njengakihoro@gmail.com">peter.njengakihoro@gmail.com</a> or call +254 708 942 431. A final retention policy will be established before launch.</p></section>`;
 }
 document.addEventListener("click", (event) => {
   const save = event.target.closest("[data-save]");
@@ -303,7 +317,7 @@ document.addEventListener("click", (event) => {
       Hub.toast("Saved for this visit. Browser storage is unavailable.");
     }
     updateSaved();
-    if (location.pathname === "/saved") applyFilters(true);
+    if (location.pathname === "/saved") Catalogue.show("saved");
   }
   const tab = event.target.closest("[data-home-body]");
   if (tab) showFeatured(tab.dataset.homeBody);
@@ -349,7 +363,7 @@ window.addEventListener("storage", (event) => {
       saved = [];
     }
     updateSaved();
-    if (location.pathname === "/saved") applyFilters(true);
+    if (location.pathname === "/saved") Catalogue.show("saved");
   }
 });
 document.getElementById("year").textContent = new Date().getFullYear();
@@ -374,17 +388,42 @@ async function init() {
     .querySelector(`[data-nav="${section}"]`)
     ?.setAttribute("aria-current", "page");
   refreshUI();
+  const extraSection = path.startsWith("/parts")
+    ? "parts"
+    : path.startsWith("/properties")
+      ? "properties"
+      : "";
+  if (extraSection) {
+    const nav = document.querySelector(`[data-nav="${extraSection}"]`);
+    nav?.classList.add("active");
+    nav?.setAttribute("aria-current", "page");
+  }
   if (section === "contact") formPage();
-  else if (section === "sell") formPage(true);
+  else if (section === "sell") Catalogue.seller();
   else if (section === "about") about();
   else if (path === "/privacy") privacy();
   else {
     try {
+      const route = {
+        "/parts/": "parts",
+        "/properties/": "properties",
+        "/catalogue/": "all",
+        "/listing/": "detail",
+        "/saved": "saved",
+      }[path];
+      if (route) {
+        await Catalogue.show(route);
+        refreshUI();
+        return;
+      }
       cars = await api("/api/cars");
       if (path.includes("car-details")) detail();
       else if (section === "cars" || path === "/saved")
         catalogue(path === "/saved");
-      else home();
+      else {
+        home();
+        Catalogue.homeSections();
+      }
     } catch {
       main.innerHTML = `<section class="container section">${empty("We couldn't load the collection.", "Please try again. You can also call us on +254 708 942 431.", '<button class="button" id="retry">Try again</button>')}</section>`;
       document.getElementById("retry").addEventListener("click", init);

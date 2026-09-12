@@ -30,9 +30,7 @@ const { createApp } = require("../backend/app");
         .getByLabel("Admin password", { exact: true })
         .fill("browser-session-password");
       await page.getByRole("button", { name: "Sign in", exact: true }).click();
-      await page
-        .getByRole("heading", { name: "Dealership overview" })
-        .waitFor();
+      await page.getByRole("heading", { name: "Business overview" }).waitFor();
     }
     await page.goto("/admin/");
     await signIn();
@@ -41,7 +39,7 @@ const { createApp } = require("../backend/app");
       content = await page.locator(".admin-workspace").boundingBox();
     assert.ok(side.x + side.width <= content.x);
     await page
-      .getByRole("button", { name: "Add vehicle", exact: true })
+      .getByRole("button", { name: "Add listing", exact: true })
       .click();
     await page.getByLabel("Make", { exact: true }).fill("Unsaved");
     await page.getByRole("heading", { name: "Welcome back." }).waitFor();

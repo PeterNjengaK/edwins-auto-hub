@@ -6,6 +6,7 @@ const {
 } = require("node:crypto");
 const fs = require("node:fs");
 const path = require("node:path");
+const { kind: categoryOf, title: listingTitle } = require("./catalogue");
 
 const defaults = {
   name: "Edwin's Auto Hub",
@@ -218,7 +219,7 @@ function management({
         .status(409)
         .json({ message: "This submission already has an inventory record." });
     const d = enquiry.details;
-    const car = {
+    let car = {
       id: randomUUID(),
       make: d.make,
       model: d.model,
@@ -230,7 +231,7 @@ function management({
       transmission: "Automatic",
       engine: "",
       color: "",
-      condition: "Locally used",
+      condition: d.condition || "Locally used",
       status: "Available",
       publication: "Draft",
       features: [],
@@ -243,12 +244,24 @@ function management({
       createdAt: now(),
       updatedAt: now(),
     };
+    if (enquiry.category && enquiry.category !== "vehicle")
+      car = {
+        ...d,
+        id: car.id,
+        description: "",
+        publication: "Draft",
+        demo: false,
+        featured: false,
+        sourceEnquiryId: enquiry.id,
+        createdAt: now(),
+        updatedAt: now(),
+      };
     transaction(db, () => {
       save(db, "cars", car);
       enquiry.convertedCarId = car.id;
       enquiry.status = "In progress";
       save(db, "enquiries", enquiry);
-      audit("Seller submission converted to draft", `${car.make} ${car.model}`);
+      audit("Seller submission converted to draft", listingTitle(car));
     });
     res.status(201).json(car);
   });
@@ -256,10 +269,11 @@ function management({
     const enquiry = get(db, "enquiries", req.params.id);
     const car = get(db, "cars", text(req.body.carId));
     const price = Number(req.body.price);
+    const quantity = Number(req.body.quantity ?? 1);
     if (!enquiry || !car)
       return res
         .status(404)
-        .json({ message: "Select an existing enquiry and vehicle." });
+        .json({ message: "Select an existing enquiry and listing." });
     if (enquiry.type === "sell")
       return res.status(400).json({
         message:
@@ -268,7 +282,7 @@ function management({
     if (enquiry.carId && enquiry.carId !== car.id)
       return res
         .status(400)
-        .json({ message: "Choose the vehicle linked to this enquiry." });
+        .json({ message: "Choose the listing linked to this enquiry." });
     if (
       car.demo ||
       car.publication === "Draft" ||
@@ -276,7 +290,7 @@ function management({
     )
       return res
         .status(400)
-        .json({ message: "A sale requires a real, published vehicle." });
+        .json({ message: "A sale requires a real, published listing." });
     if (car.status === "Sold" || enquiry.sale)
       return res
         .status(409)
@@ -285,11 +299,21 @@ function management({
       return res
         .status(400)
         .json({ message: "Enter a valid final sale price in KSh." });
+    if (
+      !Number.isInteger(quantity) ||
+      quantity < 1 ||
+      (categoryOf(car) === "part" ? quantity > car.quantity : quantity !== 1)
+    )
+      return res.status(409).json({
+        message: "Sale quantity exceeds available stock or is invalid.",
+      });
     transaction(db, () => {
       const sale = {
         id: randomUUID(),
         carId: car.id,
-        vehicle: `${car.year} ${car.make} ${car.model}`,
+        vehicle: listingTitle(car),
+        category: categoryOf(car),
+        quantity,
         price,
         at: now(),
       };
@@ -298,13 +322,18 @@ function management({
       enquiry.vehicle = sale.vehicle;
       enquiry.status = "Won";
       enquiry.followUp = "";
-      car.status = "Sold";
+      if (categoryOf(car) === "part") car.quantity -= quantity;
+      car.status =
+        categoryOf(car) === "part" && car.quantity > 0 ? "Available" : "Sold";
       car.updatedAt = now();
       car.saleId = sale.id;
       save(db, "cars", car);
       save(db, "enquiries", enquiry);
       for (const appointment of read(db, "appointments").filter(
-        (a) => a.carId === car.id && a.status === "Scheduled",
+        (a) =>
+          car.status === "Sold" &&
+          a.carId === car.id &&
+          a.status === "Scheduled",
       )) {
         appointment.status = "Cancelled";
         save(db, "appointments", appointment);
@@ -328,11 +357,14 @@ function management({
     if (!enquiry || !car)
       return res
         .status(400)
-        .json({ message: "Choose a customer enquiry and vehicle." });
-    if (enquiry.type === "vehicle" && enquiry.carId !== car.id)
+        .json({ message: "Choose a customer enquiry and listing." });
+    if (
+      ["vehicle", "listing"].includes(enquiry.type) &&
+      enquiry.carId !== car.id
+    )
       return res
         .status(400)
-        .json({ message: "Choose the vehicle linked to this enquiry." });
+        .json({ message: "Choose the listing linked to this enquiry." });
     const date = new Date(b.startsAt);
     if (
       !b.startsAt ||
@@ -349,7 +381,7 @@ function management({
     )
       return res
         .status(409)
-        .json({ message: "This vehicle is not available for a viewing." });
+        .json({ message: "This listing is not available for a viewing." });
     if (
       b.status === "Scheduled" &&
       read(db, "appointments").some(
@@ -361,7 +393,8 @@ function management({
       )
     )
       return res.status(409).json({
-        message: "This car already has a viewing within an hour of that time.",
+        message:
+          "This listing already has a viewing within an hour of that time.",
       });
     const item = {
       id: existing?.id || randomUUID(),
@@ -377,7 +410,7 @@ function management({
       save(db, "appointments", item);
       audit(
         existing ? "Viewing updated" : "Viewing scheduled",
-        `${car.make} ${car.model}`,
+        listingTitle(car),
       );
     });
     res.status(existing ? 200 : 201).json(item);
@@ -391,6 +424,13 @@ function management({
       rows = [
         [
           "ID",
+          "Category",
+          "Listing",
+          "Quantity",
+          "Location",
+          "Area",
+          "Area unit",
+          "Condition",
           "Make",
           "Model",
           "Year",
@@ -399,9 +439,24 @@ function management({
           "Status",
           "Publication",
           "Sample",
+          "Part number",
+          "Part type",
+          "Brand",
+          "Compatibility",
+          "Property type",
+          "Tenure",
+          "Bedrooms",
+          "Bathrooms",
         ],
         ...read(db, "cars").map((c) => [
           c.id,
+          categoryOf(c),
+          listingTitle(c),
+          categoryOf(c) === "part" ? c.quantity : 1,
+          c.location,
+          c.area,
+          c.areaUnit,
+          c.condition,
           c.make,
           c.model,
           c.year,
@@ -410,6 +465,14 @@ function management({
           c.status,
           c.publication || "Published",
           !!c.demo,
+          c.partNumber,
+          c.partType,
+          c.brand,
+          c.compatibility,
+          c.propertyType,
+          c.tenure,
+          c.bedrooms,
+          c.bathrooms,
         ]),
       ];
     else if (kind === "enquiries")
@@ -420,7 +483,7 @@ function management({
           "Email",
           "Phone",
           "Type",
-          "Vehicle",
+          "Listing",
           "Status",
           "Priority",
           "Follow-up",
@@ -443,7 +506,15 @@ function management({
       ];
     else if (kind === "sales")
       rows = [
-        ["Sale ID", "Vehicle", "Price KSh", "Date", "Enquiry ID"],
+        [
+          "Sale ID",
+          "Listing",
+          "Price KSh",
+          "Date",
+          "Enquiry ID",
+          "Category",
+          "Quantity",
+        ],
         ...read(db, "enquiries")
           .filter((e) => e.sale)
           .map((e) => [
@@ -452,6 +523,8 @@ function management({
             e.sale.price,
             e.sale.at,
             e.id,
+            e.sale.category || "vehicle",
+            e.sale.quantity || 1,
           ]),
       ];
     else return res.status(404).json({ message: "Export not found." });

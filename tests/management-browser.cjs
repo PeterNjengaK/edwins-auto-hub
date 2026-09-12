@@ -50,7 +50,7 @@ const { createApp } = require("../backend/app");
       .fill("browser-management-password");
     await page.getByRole("button", { name: "Sign in", exact: true }).click();
     await page.getByRole("button", { name: "Enquiries", exact: true }).click();
-    await page.getByRole("button", { name: "Create vehicle draft" }).click();
+    await page.getByRole("button", { name: "Create listing draft" }).click();
     await page
       .getByLabel("Publication", { exact: true })
       .selectOption("Published");

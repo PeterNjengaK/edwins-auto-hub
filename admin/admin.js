@@ -8,7 +8,7 @@ let csrf = "",
   editingId = null,
   existingImages = [],
   deleteId = null;
-const nameOf = (c) => `${c.make} ${c.model}`;
+const nameOf = (c) => c.title || `${c.make} ${c.model}`;
 const authenticated = async (url, method = "GET", body) => {
   const current = csrf;
   try {
@@ -35,7 +35,7 @@ function login() {
     .forEach((node) => {
       node.textContent = "";
     });
-  main.innerHTML = `<section class="login-panel">${icon("lock-keyhole")}<span class="eyebrow">EDWIN'S AUTO HUB</span><h1>Welcome back.</h1><p>Sign in to manage your vehicles and enquiries.</p><form id="login-form"><div class="field"><label for="password">Admin password</label><div class="password-wrap"><input id="password" name="password" type="password" required autocomplete="current-password"><button type="button" class="icon-button" id="show-password" aria-label="Show password" title="Show password">${icon("eye")}</button></div></div><button type="submit" class="button full">Sign in ${icon("arrow-right")}</button><div id="login-status" class="form-status" role="alert"></div></form></section>`;
+  main.innerHTML = `<section class="login-panel">${icon("lock-keyhole")}<span class="eyebrow">EDWIN'S AUTO HUB</span><h1>Welcome back.</h1><p>Sign in to manage your listings and enquiries.</p><form id="login-form"><div class="field"><label for="password">Admin password</label><div class="password-wrap"><input id="password" name="password" type="password" required autocomplete="current-password"><button type="button" class="icon-button" id="show-password" aria-label="Show password" title="Show password">${icon("eye")}</button></div></div><button type="submit" class="button full">Sign in ${icon("arrow-right")}</button><div id="login-status" class="form-status" role="alert"></div></form></section>`;
   document.getElementById("show-password").addEventListener("click", (e) => {
     const input = document.getElementById("password");
     input.type = input.type === "password" ? "text" : "password";
@@ -86,7 +86,7 @@ async function load() {
   }
 }
 function dashboard() {
-  main.innerHTML = `<div class="admin-workspace"><div class="admin-title"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Dealership overview</h1><p>Keep your collection current and your conversations moving.</p></div><div class="admin-title-actions"><button class="button outline small" id="logout">${icon("log-out")}Sign out</button><button class="button small" id="add-car">${icon("plus")}Add vehicle</button></div></div><div class="admin-stats"><div class="admin-stat"><span>Total vehicles</span><strong>${cars.length}</strong></div><div class="admin-stat"><span>Available</span><strong>${cars.filter((c) => c.status === "Available").length}</strong></div><div class="admin-stat"><span>New enquiries</span><strong>${enquiries.filter((e) => e.status === "New").length}</strong></div><div class="admin-stat"><span>Total enquiries</span><strong>${enquiries.length}</strong></div></div><div class="admin-toolbar"><div class="admin-tabs" role="group" aria-label="Dashboard view"><button data-tab="inventory" class="${tab === "inventory" ? "active" : ""}" aria-pressed="${tab === "inventory"}">${icon("car-front")} Inventory</button><button data-tab="enquiries" class="${tab === "enquiries" ? "active" : ""}" aria-pressed="${tab === "enquiries"}">${icon("inbox")} Enquiries</button></div><div class="field admin-search"><label for="admin-search" class="field-label">Search ${tab}</label><div class="search-input">${icon("search")}<input id="admin-search" placeholder="${tab === "inventory" ? "Search make or model" : "Search name, email or message"}" value="${esc(search)}"></div></div></div><div id="admin-content"></div></div>`;
+  main.innerHTML = `<div class="admin-workspace"><div class="admin-title"><div><span class="eyebrow">YOUR WORKSPACE</span><h1>Business overview</h1><p>Keep your collection current and your conversations moving.</p></div><div class="admin-title-actions"><button class="button outline small" id="logout">${icon("log-out")}Sign out</button><button class="button small" id="add-car">${icon("plus")}Add listing</button></div></div><div class="admin-stats"><div class="admin-stat"><span>Total listings</span><strong>${cars.length}</strong></div><div class="admin-stat"><span>Available</span><strong>${cars.filter((c) => c.status === "Available").length}</strong></div><div class="admin-stat"><span>New enquiries</span><strong>${enquiries.filter((e) => e.status === "New").length}</strong></div><div class="admin-stat"><span>Total enquiries</span><strong>${enquiries.length}</strong></div></div><div class="admin-toolbar"><div class="admin-tabs" role="group" aria-label="Dashboard view"><button data-tab="inventory" class="${tab === "inventory" ? "active" : ""}" aria-pressed="${tab === "inventory"}">${icon("car-front")} Inventory</button><button data-tab="enquiries" class="${tab === "enquiries" ? "active" : ""}" aria-pressed="${tab === "enquiries"}">${icon("inbox")} Enquiries</button></div><div class="field admin-search"><label for="admin-search" class="field-label">Search ${tab}</label><div class="search-input">${icon("search")}<input id="admin-search" placeholder="${tab === "inventory" ? "Search title, SKU or location" : "Search name, email or message"}" value="${esc(search)}"></div></div></div><div id="admin-content"></div></div>`;
   document.getElementById("logout").addEventListener("click", async () => {
     try {
       await authenticated("/api/logout", "POST");
@@ -106,6 +106,10 @@ function dashboard() {
 }
 function renderContent() {
   const target = document.getElementById("admin-content");
+  if (tab === "inventory") {
+    Inventory.render(target, search);
+    return;
+  }
   if (Manager.render(tab, target, search)) {
     Hub.icons();
     return;
@@ -155,13 +159,16 @@ function selectField(label, key, values, current) {
   return `<div class="field"><label for="edit-${key}">${label}</label><select id="edit-${key}" name="${key}">${values.map((v) => `<option ${v === current ? "selected" : ""}>${v}</option>`).join("")}</select></div>`;
 }
 function editCar(id) {
+  if (id && Listings.kind(cars.find((c) => c.id === id) || {}) !== "vehicle")
+    return Inventory.edit(id);
   editingId = id || null;
   const car = cars.find((c) => c.id === id) || {};
   existingImages = [...(car.images || [])];
   document.getElementById("editor-content").innerHTML =
-    `<h2>${id ? "Edit vehicle" : "Add a vehicle"}</h2><form id="car-form"><div class="form-grid">${field("Make", "make", car.make, "text", 'required maxlength="100"')}${field("Model", "model", car.model, "text", 'required maxlength="100"')}${field("Year", "year", car.year, "number", `required min="1950" max="${new Date().getFullYear() + 1}"`)}${field("Asking price (KSh)", "price", car.price, "number", 'required min="1" max="1000000000"')}${field("Mileage (km)", "mileage", car.mileage ?? 0, "number", 'required min="0" max="2000000"')}${selectField("Body type", "body", ["Sedan", "SUV", "Hatchback", "Coupe", "Pickup", "Van", "Wagon"], car.body)}${selectField("Fuel", "fuel", ["Petrol", "Diesel", "Hybrid", "Electric"], car.fuel)}${selectField("Transmission", "transmission", ["Automatic", "Manual"], car.transmission)}${field("Engine", "engine", car.engine, "text", 'maxlength="100" placeholder="e.g. 2.0L"')}${field("Colour", "color", car.color, "text", 'maxlength="100"')}${selectField("Condition", "condition", ["Foreign used", "Locally used", "New"], car.condition)}${selectField("Status", "status", ["Available", "Reserved", "Sold"], car.status)}<div class="field span-2"><label for="edit-description">Description</label><textarea id="edit-description" name="description" maxlength="3000">${esc(car.description)}</textarea></div><div class="field span-2"><label for="edit-features">Features (one per line)</label><textarea id="edit-features" name="features">${esc((car.features || []).join("\n"))}</textarea></div><div class="field span-2"><label for="edit-photos">Vehicle photos</label><div id="existing-images" class="existing-images"></div><input id="edit-photos" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Up to 4 photos total. 2 MB each. The first photo is the cover. Existing photos are kept unless removed.</small></div><label class="check-field span-2"><input name="featured" type="checkbox" ${car.featured ? "checked" : ""}>Feature on the homepage</label>${car.demo ? '<p class="notice span-2">This sample remains labelled as illustrative. Create a new listing with actual vehicle details and photos for real stock.</p>' : ""}</div><div class="editor-actions"><button class="button outline" type="button" data-close>Cancel</button><button class="button" type="submit">${icon("check")}Save vehicle</button></div><div class="form-status" role="status"></div></form>`;
+    `<h2>${id ? "Edit vehicle" : "Add a vehicle"}</h2><form id="car-form"><div class="form-grid">${field("Make", "make", car.make, "text", 'required maxlength="100"')}${field("Model", "model", car.model, "text", 'required maxlength="100"')}${field("Year", "year", car.year, "number", `required min="1950" max="${new Date().getFullYear() + 1}"`)}${field("Asking price (KSh)", "price", car.price, "number", 'required min="1" max="1000000000"')}${field("Mileage (km)", "mileage", car.mileage ?? 0, "number", 'required min="0" max="2000000"')}${selectField("Body type", "body", ["Sedan", "SUV", "Hatchback", "Coupe", "Pickup", "Van", "Wagon"], car.body)}${selectField("Fuel", "fuel", ["Petrol", "Diesel", "Hybrid", "Electric"], car.fuel)}${selectField("Transmission", "transmission", ["Automatic", "Manual"], car.transmission)}${field("Engine", "engine", car.engine, "text", 'maxlength="100" placeholder="e.g. 2.0L"')}${field("Colour", "color", car.color, "text", 'maxlength="100"')}${selectField("Condition", "condition", ["Foreign used", "Locally used", "New", "Used"], car.condition)}${selectField("Status", "status", ["Available", "Reserved", "Sold"], car.status)}<div class="field span-2"><label for="edit-description">Description</label><textarea id="edit-description" name="description" maxlength="3000">${esc(car.description)}</textarea></div><div class="field span-2"><label for="edit-features">Features (one per line)</label><textarea id="edit-features" name="features">${esc((car.features || []).join("\n"))}</textarea></div><div class="field span-2"><label for="edit-photos">Vehicle photos</label><div id="existing-images" class="existing-images"></div><input id="edit-photos" name="photos" type="file" accept="image/jpeg,image/png,image/webp" multiple><small>Up to 4 photos total. 2 MB each. The first photo is the cover. Existing photos are kept unless removed.</small></div><label class="check-field span-2"><input name="featured" type="checkbox" ${car.featured ? "checked" : ""}>Feature on the homepage</label>${car.demo ? '<p class="notice span-2">This sample remains labelled as illustrative. Create a new listing with actual vehicle details and photos for real stock.</p>' : ""}</div><div class="editor-actions"><button class="button outline" type="button" data-close>Cancel</button><button class="button" type="submit">${icon("check")}Save vehicle</button></div><div class="form-status" role="status"></div></form>`;
   renderImages();
   Manager.extendEditor(car);
+  Inventory.categoryControl(car);
   document
     .getElementById("car-form")
     .addEventListener("submit", async (event) => {
@@ -254,7 +261,7 @@ document
       await authenticated(`/api/cars/${deleteId}`, "DELETE");
       document.getElementById("confirm-dialog").close();
       await load();
-      Hub.toast("Vehicle deleted.");
+      Hub.toast("Listing deleted.");
     } catch (error) {
       document.getElementById("delete-error").textContent = error.message;
     } finally {

@@ -23,6 +23,21 @@ If port 3000 is busy, set `PORT=3001` in `.env`. The server binds to `127.0.0.1`
 
 The website and API are served together. Use the Node server, not Live Server or direct HTML-file opening. Existing URLs such as `/cars/`, `/sell/`, and `/cars/car-details.html?id=...` are handled by the server and share `index.html`.
 
+## Multi-category catalogue
+
+One inventory, enquiry inbox, customer list, viewing calendar and sales report now cover:
+
+- **Cars:** new and used, including locally used and foreign used vehicles, with the existing vehicle specifications and filters.
+- **Car parts:** new/used condition, SKU or part number, brand, part type, compatibility, location, unit price and stock quantity.
+- **Land and plots:** location, area, area unit, property type, tenure and asking price.
+- **Houses:** new/used condition, house type, bedrooms, bathrooms, floor area, location, tenure and asking price.
+
+Browse `/cars/`, `/parts/`, `/properties/`, or `/catalogue/`. Saved listings work across all categories. Seller submissions use category-specific fields and remain private until an admin reviews and publishes a draft.
+
+In the admin workspace, choose **Add listing**, then a category. Existing listings keep their category to protect linked history. Parts sale prices are the **total transaction amount**, not the unit price; enter the quantity sold separately. Sales deduct stock, reject overselling and only mark a part sold when its quantity reaches zero. Edit a parts listing to restock it and set its availability. Cars and properties are single-unit sales. Recorded sales cannot be deleted, and sold cars/properties cannot be reopened. Outstanding viewings are cancelled when a listing sells out.
+
+The legacy SQLite `cars` table and admin write URLs remain for compatibility; records without a category are cars. Public `/api/cars` remains vehicle-only, while `/api/listings` covers all published categories. No destructive database migration is required.
+
 ## What works
 
 - Search and filter cars by make, body type, budget, year, fuel, transmission, and availability.
@@ -42,7 +57,7 @@ The website and API are served together. Use the Node server, not Live Server or
 
 Inventory and enquiries persist in `backend/storage/hub.sqlite`. Keep the entire storage directory private and backed up. Stop the server before making a filesystem backup so SQLite's database and journal files stay consistent. Never commit storage, credentials, or customer information.
 
-The first development startup seeds six clearly labelled sample vehicles. All sample photos, prices, and specifications are illustrative, not actual stock or verified offers. New admin listings are real inventory entries and require appropriate photos. Set `SEED_DEMO=false` before first startup to start empty; this does not erase an existing database. Production startup does not seed sample inventory.
+The first development startup seeds six clearly labelled sample vehicles and six sample parts/property listings. All sample photos, prices, and specifications are illustrative, not actual stock or verified offers. New admin listings are real inventory entries and require appropriate photos. Set `SEED_DEMO=false` before first startup to start empty; this does not erase an existing database. Production startup does not seed sample inventory. An existing local preview can opt into the additional samples with `node tools/add-catalogue-samples.cjs`; this adds missing sample IDs without changing existing inventory or enquiries. Do not run that command on live customer data.
 
 Enquiries are saved in the admin inbox. They do **not** send email or WhatsApp notifications. The WhatsApp and phone links open the visitor's own app; they do not send messages automatically. Contact details are retained from the original project and must be confirmed before launch.
 
@@ -71,7 +86,7 @@ npx.cmd playwright install chromium
 npm.cmd run test:browser
 ```
 
-API tests cover authentication, CSRF protection, validation, immutable IDs, preserved photos, enquiry privacy, CRUD, session expiry on restart, and database persistence. Browser tests exercise search, sorting, saved cars, enquiries, seller submissions, admin CRUD, and responsive rendering at 390, 768, and 1920 pixels. Screenshots are saved under the ignored `test-results/` directory. Tests use isolated temporary databases and do not touch your local inventory or inbox.
+API tests cover authentication, CSRF protection, validation, immutable IDs and categories, preserved photos, enquiry privacy, CRUD, session expiry, database persistence, seller conversions, parts quantities, oversell protection and property sales. Browser tests exercise every category, search, sorting, saved listings, enquiries, seller submissions, admin publishing and creation, sale recording, and responsive layouts. Screenshots are saved under the ignored `test-results/` directory. Tests use isolated temporary databases and do not touch your local inventory or inbox.
 
 Use `npm.cmd run format` to format maintained source files.
 
